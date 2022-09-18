@@ -5,9 +5,10 @@ const database = require("../config/connection");
 const auth = require("../routes/auth");
 const bodyParser = require("body-parser");
 const passport = require("passport");
+const { default: accessEnv } = require("./helpers/accessEnv");
 
 const app = express();
-const port = process.env.PORT || 3434;
+const port = accessEnv("PORT") || 3434;
 
 // Body Parser
 app.use(bodyParser.urlencoded({ extended: false }));

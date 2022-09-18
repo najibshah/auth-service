@@ -4,9 +4,10 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
+const { default: accessEnv } = require("../src/helpers/accessEnv");
 
 //Api key for jwt token generation
-const key = process.env.SECRET_OR_KEY;
+const key = accessEnv("SECRET_OR_KEY");
 
 //User Model
 require("../models/User");
@@ -40,7 +41,7 @@ router.get("/users", (req, res) => {
 // @route   GET /user/:email
 // @desc    Get user by email
 // @access  Public
-router.get("/user/:email", (req, res) => {
+router.get("/:email", (req, res) => {
   const errors = {};
   console.log(req.params.email);
   User.findOne({ email: req.params.email })
@@ -59,31 +60,27 @@ router.get("/user/:email", (req, res) => {
 // @route   POST api/Profile
 // @desc    edit user roles
 // @access  Private
-router.post(
-  "/editUser",
-  passport.authenticate("jwt", { session: false }),
-  (req, res) => {
-    const profileFields = {};
-    console.log(req.body);
+router.post("/editUser", (req, res) => {
+  const profileFields = {};
+  console.log(req.body);
 
-    //profileFields.user = req.user.email;
-    if (req.body.role) profileFields.role = req.body.role;
+  //profileFields.user = req.user.email;
+  if (req.body.role) profileFields.role = req.body.role;
 
-    User.findOne({ user: req.user.email }).then((profile) => {
-      if (profile) {
-        //Update
-        User.findOneAndUpdate(
-          { email: req.body.email },
-          { $set: profileFields },
-          { new: true }
-        ).then((profile) => res.json(profile));
-      } else {
-        //Save Profile
-        new Profile(profileFields).save().then((profile) => res.json(profile));
-      }
-    });
-  }
-);
+  User.findOne({ user: req.body.email }).then((profile) => {
+    if (profile) {
+      //Update
+      User.findOneAndUpdate(
+        { email: req.body.email },
+        { $set: profileFields },
+        { new: true }
+      ).then((profile) => res.json(profile));
+    } else {
+      //Save Profile
+      new Profile(profileFields).save().then((profile) => res.json(profile));
+    }
+  });
+});
 
 // @route   Post /register
 // @desc    Register user

@@ -2,9 +2,10 @@
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const mongoose = require("mongoose");
+const { default: accessEnv } = require("../src/helpers/accessEnv");
 
 //API key for jwt strategy
-const key = process.env.SECRET_OR_KEY;
+const key = accessEnv("SECRET_OR_KEY");
 
 //User Model
 require("../models/User");
